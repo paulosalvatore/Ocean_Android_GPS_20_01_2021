@@ -3,6 +3,9 @@ package com.oceanbrasil.ocean_android_gps_20_01_2021
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.location.Location
+import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.widget.Toast
@@ -12,6 +15,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 
@@ -79,7 +83,39 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                             .position(latLng)
                             .title("Minha posição")
             )
+
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18f))
+
+            mMap.addCircle(
+                    CircleOptions()
+                            .center(latLng)
+                            .radius(50.0)
+                            .strokeColor(Color.RED)
+                            .fillColor(Color.BLUE)
+            )
         }
+
+        locationManager.requestLocationUpdates(
+                locationProvider,
+                1000,
+                1F,
+                object : LocationListener {
+                    override fun onLocationChanged(location: Location) {
+                        val latLng = LatLng(location.latitude, location.longitude)
+
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18f))
+                    }
+
+                    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+                    }
+
+                    override fun onProviderEnabled(provider: String?) {
+                    }
+
+                    override fun onProviderDisabled(provider: String?) {
+                    }
+                }
+        )
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
